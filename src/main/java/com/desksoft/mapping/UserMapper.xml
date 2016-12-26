@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="UserMapper" >
+  <resultMap id="BaseResultMap" type="com.wshsoft.dal.domain.User" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="loginName" property="loginName" jdbcType="VARCHAR" />
+    <result column="userId" property="userId" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="userName" property="userName" jdbcType="VARCHAR" />
+    <result column="skin" property="skin" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="gmt_create" property="gmt_create" jdbcType="TIMESTAMP" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="gmt_modified" property="gmt_modified" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, loginName, userId, password, userName, skin, status, gmt_create, email, phone, 
+    gmt_modified
+  </sql>
+  <select id="userlistPage" resultType="pd" parameterType="page" useCache="false" >
+    select
+    <include refid="Base_Column_List" />
+    from user
+    <where >
+      status!=-1 
+      <if test="pd.loginName != null and pd.loginName !=''" >
+         and loginName = #{pd.loginName,jdbcType=VARCHAR}
+      </if>
+      <if test="pd.userId != null and pd.userId !=''" >
+         and userId = #{pd.userId,jdbcType=VARCHAR}
+      </if>
+      <if test="pd.password != null and pd.password !=''" >
+         and password = #{pd.password,jdbcType=VARCHAR}
+      </if>
+      <if test="pd.userName != null and pd.userName !=''" >
+         and userName = #{pd.userName,jdbcType=VARCHAR}
+      </if>
+      <if test="pd.skin != null and pd.skin !=''" >
+         and skin = #{pd.skin,jdbcType=VARCHAR}
+      </if>
+      <if test="pd.status != null and pd.status !=''" >
+         and status = #{pd.status,jdbcType=INTEGER}
+      </if>
+      <if test="pd.email != null and pd.email !=''" >
+         and email = #{pd.email,jdbcType=VARCHAR}
+      </if>
+      <if test="pd.phone != null and pd.phone !=''" >
+         and phone = #{pd.phone,jdbcType=VARCHAR}
+      </if>
+    </where>
+    order by gmt_modified desc
+  </select>
+  <select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from user
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <insert id="save" parameterType="com.wshsoft.dal.domain.User" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into user (loginName, userId, password, 
+      userName, skin, status, gmt_create, email, 
+      phone, gmt_modified)
+    values (#{loginName,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{userName,jdbcType=VARCHAR}, #{skin,jdbcType=VARCHAR}, 0, now(), #{email,jdbcType=VARCHAR}, 
+      #{phone,jdbcType=VARCHAR}, now())
+  </insert>
+  <update id="update" parameterType="com.wshsoft.dal.domain.User" >
+    update user
+    <set >
+      <if test="loginName != null and loginName !=''" >
+        loginName = #{loginName,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null and userId !=''" >
+        userId = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null and password !=''" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null and userName !=''" >
+        userName = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="skin != null and skin !=''" >
+        skin = #{skin,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null and status !=''" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="email != null and email !=''" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null and phone !=''" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      gmt_modified=now()
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <delete id="delete" parameterType="java.lang.Integer" >
+     update user set status = -1,gmt_modified=now()
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+</mapper>
